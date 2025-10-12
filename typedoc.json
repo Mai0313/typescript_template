@@ -1,0 +1,27 @@
+{
+  "entryPoints": ["./src/index.ts"],
+  "out": "./docs/api",
+  "plugin": ["typedoc-plugin-markdown"],
+  "theme": "default",
+  "includeVersion": true,
+  "excludePrivate": true,
+  "excludeProtected": false,
+  "excludeExternals": true,
+  "readme": "./README.md",
+  "name": "TypeScript Template",
+  "navigation": {
+    "includeCategories": true,
+    "includeGroups": true
+  },
+  "categorizeByGroup": true,
+  "sort": ["source-order", "required-first"],
+  "kindSortOrder": [
+    "Function",
+    "Class",
+    "Interface",
+    "Type alias",
+    "Variable",
+    "Enumeration"
+  ]
+}
+

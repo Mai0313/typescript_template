@@ -1,0 +1,11 @@
+dist
+node_modules
+coverage
+.cache
+*.md
+*.yml
+*.yaml
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+

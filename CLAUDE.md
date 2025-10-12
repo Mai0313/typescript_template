@@ -4,48 +4,49 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a Python project template designed to bootstrap production-ready projects quickly. The codebase follows a modern `src/` layout with comprehensive tooling for development, testing, documentation, and deployment.
+This is a TypeScript project template designed to bootstrap production-ready Node.js projects quickly. The codebase follows a modern `src/` layout with comprehensive tooling for development, testing, documentation, and deployment.
 
-**Package name**: `repo_template`
-**Python support**: 3.10, 3.11, 3.12, 3.13
-**Dependency manager**: `uv`
-**Documentation**: MkDocs Material with mkdocstrings
+**Package name**: `ts_template`
+**Node.js support**: 18, 20, 22
+**Package manager**: `npm`
+**Documentation**: TypeDoc with markdown plugin
 
 ## Common Development Commands
 
 ### Environment Setup
 
 ```bash
-make uv-install           # Install uv (one-time setup)
-uv sync                   # Install base dependencies
-uv sync --group test      # Include test dependencies
-uv sync --group docs      # Include docs dependencies
-uv sync --group dev       # Include dev tools (pre-commit, poe, notebook)
+npm install              # Install dependencies
+npm ci                   # Clean install (for CI/CD)
 ```
 
 ### Running Tests
 
 ```bash
-make test                 # Run pytest with coverage
-pytest                    # Direct pytest invocation
-pytest -vv                # Verbose output
-pytest tests/test_*.py    # Run specific test file
-uv run pytest -n auto     # Run with parallel execution (xdist)
+make test                # Run vitest
+npm test                 # Direct vitest invocation
+npm run test:watch       # Watch mode
+npm run test:ui          # UI mode
+npm run test:coverage    # Run with coverage
 ```
 
 ### Code Quality
 
 ```bash
-make format               # Run all pre-commit hooks (ruff, mypy, etc.)
-pre-commit run -a         # Same as make format
+make check               # Run all checks (type-check + format + lint)
+npm run type-check       # TypeScript type checking
+npm run lint             # ESLint with auto-fix
+npm run lint:nofix       # ESLint without fixing
+npm run format           # Format with Prettier
+npm run format:check     # Check formatting only
 ```
 
 ### Documentation
 
 ```bash
-make gen-docs             # Generate API docs from src/ and scripts/
-uv run mkdocs serve       # Serve docs at http://localhost:9987
-uv run poe docs           # Generate and serve (requires dev group)
+make gen-docs            # Generate API docs
+npm run docs:generate    # Generate TypeDoc documentation
+npm run docs:serve       # Serve docs at http://localhost:3000
 ```
 
 ### CLI Entry Points
@@ -53,82 +54,80 @@ uv run poe docs           # Generate and serve (requires dev group)
 The project defines two CLI entry points (both execute the same function):
 
 ```bash
-uv run repo_template      # Primary CLI entrypoint
-uv run cli                # Alternative entrypoint
+npm run cli              # Development mode with tsx
+npm run dev              # Watch mode
+node dist/cli.js         # After building
 ```
 
 ### Building and Publishing
 
 ```bash
-uv build                  # Build wheel and sdist to dist/
-UV_PUBLISH_TOKEN=... uv publish   # Publish to PyPI
+npm run build            # Build TypeScript to dist/
+npm publish              # Publish to npm (requires authentication)
 ```
 
-### Running from PyPI
+### Running from npm
 
 After publishing, the CLI can be run without installation:
 
 ```bash
-uvx repo_template                              # Run latest from PyPI
-uvx --from repo_template==0.1.0 repo_template  # Run specific version
+npx ts-template greet World
 ```
 
 ### Maintenance
 
 ```bash
-make clean                # Remove caches, artifacts, generated docs
+make clean               # Remove caches, artifacts, generated docs
 ```
 
 ## Project Architecture
 
 ### Source Layout
 
-- **`src/repo_template/`**: Main package code
-  - `cli.py`: CLI entry point with example `Response` Pydantic model and `main()` function
-  - Uses Pydantic models with `Field()` descriptors and Google-style docstrings
+- **`src/`**: Main package code
+  - `cli.ts`: CLI entry point with Commander.js and example commands
+  - `index.ts`: Public API exports
+  - `types/`: TypeScript type definitions and Zod schemas
+  - `utils/`: Utility functions (logger, helpers)
 
 ### Testing Infrastructure
 
 - **Test directory**: `tests/`
-- **Test discovery**: Files matching `test_*.py`
-- **Coverage**: Minimum 80% required (`--cov-fail-under=80`)
-- **Parallel execution**: Enabled via pytest-xdist (`-n=auto`)
-- **Reports**: Generated in `.github/reports/` (coverage.xml, pytest_logs.log)
-- **Async support**: `asyncio_mode = "auto"` for async test functions
+- **Test discovery**: Files matching `*.test.ts` or `*.spec.ts`
+- **Coverage**: Minimum 80% required (lines, functions, branches, statements)
+- **Reports**: Generated in `coverage/` (HTML, JSON, LCOV)
+- **Framework**: Vitest with v8 coverage provider
 
 ### Documentation Generation
 
-- **Script**: `scripts/gen_docs.py` (async, supports concurrency)
-- **Modes**:
-  - `--mode class`: Generate docs per class (default)
-  - `--mode file`: Generate docs per file
-- **File types**: Supports `.py` and `.ipynb` (notebooks)
-- **Execution**: `--execute` flag to run notebooks before conversion
-- **Output**: Preserves source folder structure in docs
-- **Usage**:
-  ```bash
-  python scripts/gen_docs.py --source ./src --output ./docs/Reference gen_docs
-  ```
+- **Tool**: TypeDoc with markdown plugin
+- **Output**: `docs/api/`
+- **Configuration**: `typedoc.json`
+- **Features**: 
+  - Automatic API documentation from TypeScript code
+  - Markdown output for GitHub Pages compatibility
+  - Category and group navigation
+  - Version tracking
 
 ### Docker and Services
 
-- **Dockerfile**: Multi-stage build with uv/uvx and Node.js
+- **Dockerfile**: Multi-stage build with Node.js Alpine
 - **docker-compose.yaml**: Includes optional services:
   - `redis` (port 6379)
   - `postgresql` (port 5432)
   - `mongodb` (port 27017)
   - `mysql` (port 3306)
   - `app`: Example service running the CLI
-- **Configuration**: Via `.env` file (see README.md for keys)
+- **Configuration**: Via `.env` file (create from `.env.example`)
 
 ### CI/CD Workflows
 
 All workflows are in `.github/workflows/`:
 
-- **test.yml**: Runs pytest on Python 3.10-3.13 for PRs to main/release/\* (ignores markdown files)
-- **code-quality-check.yml**: Runs pre-commit hooks on PRs
-- **deploy.yml**: Builds and deploys MkDocs to GitHub Pages on push to main and tags `v*`
-- **build_package.yml**: Builds wheel/sdist on tags `v*`, generates changelog via git-cliff
+- **test.yml**: Runs Vitest on Node.js 18/20/22 for PRs to main/release/* (ignores markdown files)
+- **code-quality-check.yml**: Runs TypeScript type checking, ESLint, and Prettier on PRs
+- **deploy.yml**: Builds and deploys TypeDoc to GitHub Pages on push to main and tags `v*`
+- **build_release.yml**: Builds executables with pkg and publishes to npm on tags `v*`
 - **build_image.yml**: Builds and pushes Docker image to GHCR on main and tags `v*`
 - **release_drafter.yml**: Maintains draft releases from Conventional Commits
 - **auto_labeler.yml**: Auto-applies PR labels based on `.github/labeler.yml`
@@ -137,70 +136,79 @@ All workflows are in `.github/workflows/`:
 
 ### Code Style and Linting
 
-- **Linter**: ruff with extensive rule sets (see pyproject.toml)
-- **Line length**: 99 characters (Google Python Style Guide)
-- **Naming**: snake_case (functions/vars), PascalCase (classes), UPPER_CASE (constants)
-- **Type hints**: Required on public functions; mypy with Pydantic plugin enabled
-- **Docstrings**: Google-style (configured in mkdocstrings)
-- **Allowed confusables**: Chinese punctuation marks are allowed
+- **Linter**: ESLint 9 with flat config
+- **Formatter**: Prettier
+- **Line length**: 99 characters
+- **Naming**: camelCase (functions/vars), PascalCase (classes/types), UPPER_CASE (constants)
+- **Type hints**: Required on all public functions
+- **Comments**: JSDoc style for public APIs
 - **Per-file ignores**:
-  - `tests/*`: Ignore S101 (assert), ANN (annotations), SLF001 (private access)
-  - `*.ipynb`: Ignore T201 (print), F401 (unused imports), S105, F811, ANN, PERF, SLF
+  - `**/*.test.ts`, `**/*.spec.ts`: Relaxed rules for test files
+  - `**/*.config.js`, `**/*.config.ts`: Ignored by ESLint
 
 ### Dependency Management
 
 ```bash
-uv add <package>              # Add production dependency
-uv add <package> --dev        # Add development dependency
-uv remove <package>           # Remove dependency
+npm install <package>              # Add production dependency
+npm install <package> --save-dev   # Add development dependency
+npm uninstall <package>            # Remove dependency
 ```
 
 ### Conventions
 
 - **Commit style**: Conventional Commits enforced for PR titles
-- **Versioning**: PEP 440 via `dunamai` in CI from git tags
-- **Changelog**: Generated via `git-cliff` from conventional commits
-- **Pre-commit stages**: Runs on pre-commit, post-checkout, post-merge, post-rewrite
+- **Versioning**: SemVer via npm version command
+- **Changelog**: Can be generated via git-cliff
+- **Branch naming**: feature/, fix/, docs/, chore/, etc.
 
 ## Testing Notes
 
-- Tests run in parallel by default (`-n=auto`)
-- Coverage reports committed to `.github/reports/`
-- PR comments show coverage summary automatically
-- Use markers for special cases:
-  - `@pytest.mark.slow`: For slow tests
-  - `@pytest.mark.skip_when_ci`: Skip in CI/CD
-- Async tests are automatically detected and run
+- Tests use Vitest's global test APIs (describe, it, expect)
+- Mock functions with vi.fn() and vi.spyOn()
+- Coverage reports committed to `coverage/`
+- Coverage thresholds: 80% for lines, functions, branches, statements
 
 ## Publishing Workflow
 
-1. Tag with version: `git tag v0.1.0`
-2. Push tag: `git push origin v0.1.0`
-3. CI builds package and Docker image
-4. Optional: Auto-publish to PyPI (requires UV_PUBLISH_TOKEN secret)
-5. Changelog auto-generated via git-cliff
-6. Draft release created via release_drafter
+1. Update version: `npm version patch|minor|major`
+2. Tag is created automatically by npm version
+3. Push tag: `git push origin v*`
+4. CI builds package and Docker image
+5. Optional: Auto-publish to npm (requires NPM_TOKEN secret)
+6. Executables uploaded to GitHub Release
 
 ## Documentation System
 
-- **Serve locally**: `uv run mkdocs serve` (http://localhost:9987)
-- **Deploy**: `mkdocs gh-deploy` or push to main (auto-deploys)
-- **API docs**: Auto-generated from docstrings via mkdocstrings
-- **Features**: Inheritance diagrams, markdown-exec, MathJax support
-- **Bilingual**: Scaffolded for multiple languages (en, zh-TW, zh-CN)
+- **Serve locally**: `npm run docs:serve` (http://localhost:3000)
+- **Deploy**: Automatic on push to main via GitHub Actions
+- **API docs**: Auto-generated from TypeScript code and JSDoc comments
+- **Format**: Markdown for GitHub Pages compatibility
 
 ## Package Configuration
 
-- **Build backend**: hatchling
-- **Entry points**: Defined in `[project.scripts]` in pyproject.toml
-- **Include in wheel**: `src/repo_template`
-- **Sdist excludes**: Hidden files/dirs (.github, .devcontainers, .venv, etc.)
+- **Build tool**: TypeScript compiler (tsc) + tsc-alias for path mapping
+- **Entry points**: Defined in `bin` field in package.json
+- **Include in package**: `dist/` directory
+- **Exclude**: Source files, tests, config files
 
 ## Important Paths
 
-- Source code: `src/repo_template/`
+- Source code: `src/`
 - Tests: `tests/`
-- Documentation: `docs/`
-- Scripts: `scripts/`
-- CI reports: `.github/reports/`
-- Cache directories: `.cache/` (pytest, ruff, mypy, logfire)
+- Build output: `dist/`
+- Documentation: `docs/api/`
+- Coverage reports: `coverage/`
+- Cache: `.cache/`, `.eslintcache`
+
+## Key Technologies
+
+- **Runtime**: Node.js (18+)
+- **Language**: TypeScript 5.6+
+- **CLI Framework**: Commander.js
+- **Validation**: Zod
+- **Testing**: Vitest + @vitest/coverage-v8
+- **Linting**: ESLint 9
+- **Formatting**: Prettier
+- **Documentation**: TypeDoc
+- **Build**: tsc + tsc-alias
+- **Development**: tsx (TypeScript executor)
