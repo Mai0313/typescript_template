@@ -1,4 +1,4 @@
-<center>
+<div align="center" markdown="1">
 
 # TypeScript 项目模板
 
@@ -13,7 +13,7 @@
 [![license](https://img.shields.io/badge/License-MIT-green.svg?labelColor=gray)](https://github.com/Mai0313/ts_template/blob/main/LICENSE)
 [![PRs](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/Mai0313/ts_template/pulls)
 
-</center>
+</div>
 
 🚀 帮助 TypeScript 开发者「快速建立新项目」的模板。内置现代化工具链、测试基础设施、Docker 与完整 CI/CD 工作流程。
 

@@ -1,4 +1,4 @@
-<center>
+<div align="center" markdown="1">
 
 # TypeScript Project Template
 
@@ -13,7 +13,7 @@
 [![license](https://img.shields.io/badge/License-MIT-green.svg?labelColor=gray)](https://github.com/Mai0313/ts_template/blob/main/LICENSE)
 [![PRs](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/Mai0313/ts_template/pulls)
 
-</center>
+</div>
 
 🚀 A production-ready TypeScript project template to help developers bootstrap new Node.js projects fast. It includes modern tooling, testing infrastructure, Docker, and a complete CI/CD suite.
 
